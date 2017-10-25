@@ -10,11 +10,11 @@
 1. All source code files must have a maximum line width of 80 characters.
        Clarification:   Code with longer line width than 80 characters violates 
                         this rule and is not premitted.
-       Exception:       A single whitespace character can be used in column 81.
+       Exceptions:      A single whitespace character can be used in column 81.
                         Comments whom otherwise would harm readability if moved
                         elsewhere.
                         
 
 2. No comments that does not complement the code.
        Clarification:   Comments that 'states the obvious' are not premitted.
-       Exception:       None. 
+       Exceptions:      None. 

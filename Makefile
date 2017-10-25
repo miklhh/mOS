@@ -14,20 +14,22 @@ ASFLAGS := -felf32
 
 # Linker options
 LD := $(CROSS)/i686-elf-gcc
-LIBS = -nostdlib -lgcc
+LIBS := -nostdlib -lgcc
 LDFLAGS := -T linker/link.ld
 
-# Pattern specific rules
+# Pattern specific compile rules.
 %.o: %.c
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 %.o: %.asm
 	$(AS) $(ASFLAGS) $<
 
-# Targets.
-.PHONY: all headers libc iso
+####################
+#     TARGETS      #
+####################
+.PHONY: all sysroot headers libc kernel iso
 
-all: sysroot headers kernel libc kernel iso
+all: sysroot headers libc drivers kernel iso
 
 sysroot:
 	mkdir -p $(SYSROOT)
@@ -39,18 +41,6 @@ sysroot:
 headers:
 	cp -r include $(SYSROOT)/usr/
 
-####################
-#      KERNEL      #
-####################
-.PHONY: kernel
-
-KERNEL_OBJS  = $(patsubst %.c,%.o,$(wildcard kernel/*.c))
-KERNEL_OBJS += $(patsubst %.asm,%.o,$(wildcard kernel/*.asm))
-
-kernel: $(KERNEL_OBJS)
-	$(LD) $(LDFLAGS) $(LIBS) $(KERNEL_OBJS) -o $(SYSROOT)/boot/kernel.elf32
-
-
 
 ####################
 #      LIBC        #
@@ -60,18 +50,45 @@ kernel: $(KERNEL_OBJS)
 
 
 ####################
+#     DRIVERS      #
+####################
+.PHONY: drivers
+
+DRIVER_OBJS := $(patsubst %.c,%.o,$(wildcard drivers/*/*.c))
+
+drivers: $(DRIVER_OBJS)
+
+
+####################
+#      KERNEL      #
+####################
+.PHONY: kernel kernel-objs
+
+KERNEL_OBJS  = $(patsubst %.c,%.o,$(wildcard kernel/*.c))
+KERNEL_OBJS += $(patsubst %.asm,%.o,$(wildcard kernel/*.asm))
+KERNEL_OBJS += $(DRIVER_OBJS)
+KERNEL_NAME  = kernel32.elf
+
+kernel-objs: $(KERNEL_OBJS)
+
+kernel: kernel-objs drivers
+	$(LD) $(LDFLAGS) $(LIBS) $(KERNEL_OBJS) -o $(SYSROOT)/boot/$(KERNEL_NAME)
+
+
+####################
 #      CLEAN       #
 ####################
-.PHONY: clean clean-all
+.PHONY: clean clean-all clean-sysroot clean-objs clean-drivers
 
 clean: clean-all
 
-clean-all: clean-sysroot clean-objs
+clean-all: clean-sysroot clean-objs clean-drivers
 
 clean-sysroot:
-	rm -rvf sysroot
+	-rm -rvf sysroot
 
 clean-objs:
-	rm -rv kernel/*.o
+	-rm -rv kernel/*.o
 
-
+clean-drivers:
+	-rm -rv drivers/*/*.o

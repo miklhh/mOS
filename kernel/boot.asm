@@ -1,3 +1,8 @@
+;
+; Part of mOS (Minimalistic Operating System).
+; Code may freely be used under the MIT-license.
+;
+
 MBALIGN     equ 1<<0
 MEMINFO     equ 1<<1
 FLAGS       equ MBALIGN | MEMINFO
@@ -26,7 +31,7 @@ _start:
     mov     esp, stack_top      ; Setup the kernel stack.
     push    esp                 ; kmain parameter 3: 'uintptr_t stack_bottom'.
     push    eax                 ; kmain parameter 2: 'uint32_t multiboot_magic'.
-    push    ebx                 ; kmail parameter 1: 'struct multiboot_info info'.
+    push    ebx                 ; kmail parameter 1: 'struct multiboot_info *info'.
     extern  kmain               ; Prepare to invode kernel main function.
     call    kmain               ; Invoke kernel main function.
 

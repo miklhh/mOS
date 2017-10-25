@@ -1,5 +1,6 @@
 /* 
- * Header for bootinformaion.
+ * Part of mOS (Minimalistic Operating System).
+ * Code may freely be used under the MIT-license.
  */
 
 #ifndef _BOOT_H
