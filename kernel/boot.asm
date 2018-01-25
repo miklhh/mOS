@@ -29,10 +29,11 @@ global _start
 _start:
     cli                         ; Clear interrupt flag.
     mov     esp, stack_top      ; Setup the kernel stack.
-    push    esp                 ; kmain parameter 3: 'uintptr_t stack_bottom'.
+    push    esp                 ; kmain parameter 4: 'uintptr_t stack_top'.
+    push    stack_bottom        ; kmain parameter 3: 'uintptr_t stack_bottom'. 
     push    eax                 ; kmain parameter 2: 'uint32_t multiboot_magic'.
     push    ebx                 ; kmail parameter 1: 'struct multiboot_info *info'.
-    extern  kmain               ; Prepare to invode kernel main function.
+    extern  kmain               ; Prepare to invoke kernel main function.
     call    kmain               ; Invoke kernel main function.
 
 hang:

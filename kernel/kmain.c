@@ -9,31 +9,37 @@
 #include <stdint.h>
 #include <drivers/vga.h>
 #include <terminal.h>
+#include <kstdio.h>
 
-void kmain(struct multiboot_info *info, uint32_t magic, uintptr_t stack_bottom)
+void kmain(
+        struct multiboot_info *info, 
+        uint32_t magic, 
+        uintptr_t stack_bottom, 
+        uintptr_t stack_top)
 {
     (void) info;
-    (void) magic;
     (void) stack_bottom;
 
-    if (magic != MULTIBOOT_BOOTLOADER_MAGIC)
-    {
-        // PANIC
-    }
+    // Initialize VGA and kernel terminal.
     system_init_vga();
     system_init_terminal();
-    terminal_putc('A');
-    terminal_putc('B');
-    terminal_putc('C');
-    terminal_putc(' ');
-    terminal_puts("Hello kernel world! Have a nice day!\n");
-    terminal_puts("-- WOOW! --");
-    //vga_putchar(':', vga_color(VGA_COLOR_BLUE, VGA_COLOR_RED), 0, 0);
-    //vga_putchar('D', vga_color(VGA_COLOR_RED, VGA_COLOR_BLUE), 1, 0);
 
-    vga_cursor_set_position(5, 20);
-    vga_cursor_disable();
-    vga_cursor_enable();
-    vga_cursor_set_position(20, 20);
+    // Tset for successful multiboot.
+    if (magic != MULTIBOOT_BOOTLOADER_MAGIC)
+    {
+        // PANIC!
+        kprintf("Error: unsuccessful multiboot.\n");
+        kprintf("Expected boot magic: 0x%x vs acctual: 0x%x", 
+                MULTIBOOT_BOOTLOADER_MAGIC, magic);
+    }
+    else
+    {
+        kprintf("Successful multiboot. Magic: 0x%x\n", magic);
+        kprintf("Kernel stack bottom: 0x%x\n", stack_bottom);
+        kprintf("Kernel stack top:    0x%x\n", stack_top);
+        kprintf("Kernel stack size:   0x%x\n", stack_top - stack_bottom);
+    }
+
+    while(1) { }
 
 }

@@ -16,7 +16,7 @@ char *strcpy(char *dst, const char *src);
 char *strncpy(char *dst, const char *src);
 
 // Other routines:
-void *memset(void *p, int value, size_t n);
+void *memset(void *ptr, int value, size_t n);
 size_t strlen(const char *str);
 
 #endif

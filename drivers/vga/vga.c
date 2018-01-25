@@ -33,17 +33,11 @@ void system_init_vga()
 // Routine for writing a character to the screen via the vga chip.
 void vga_putchar(unsigned char character, uint8_t color, size_t x, size_t y)
 {
-    if (x >= SCREEN_WIDTH || y >= SCREEN_HEIGHT)
-    {
-        return;
-    }
-    else
-    {
-        VIDEO_MEMORY[y * SCREEN_WIDTH + x] = create_char(character, color);
-    }
+    if (x >= SCREEN_WIDTH || y >= SCREEN_HEIGHT) return;
+    VIDEO_MEMORY[y * SCREEN_WIDTH + x] = create_char(character, color);
 }
 
-// Small routing to be used by the terminal module.
+// Small routine to be used by the terminal module.
 void vga_putc(char c, size_t x, size_t y)
 {
     uint8_t fg = VGA_COLOR_WHITE;
@@ -71,9 +65,15 @@ void vga_cursor_disable()
 // Set the text mode cursor.
 void vga_cursor_set_position(size_t x, size_t y)
 {
+    // The 'y' position is of by one.
+    y++;
+    const uint16_t SELECT_CURSOR_HIGH = 0x0E;
+    const uint16_t SELECT_CURSOR_LOW = 0x0F;
     uint16_t pos = y * SCREEN_WIDTH + x;
-    outb(PORT_VGA_ADDR_REG, 0x0F);
-    outb(PORT_VGA_DATA_REG, (uint8_t) (pos & 0xFF));
-    outb(PORT_VGA_ADDR_REG, 0x0E);
-    outb(PORT_VGA_DATA_REG, (uint8_t) ((pos >> 8) & 0xFF));
+    uint8_t cursor_location_low = (uint8_t)(pos & 0xff);
+    uint8_t cursor_location_high = (uint8_t)((pos >> 8) & 0xFF);
+    outb(PORT_VGA_ADDR_REG, SELECT_CURSOR_LOW);
+    outb(PORT_VGA_DATA_REG, cursor_location_low);
+    outb(PORT_VGA_ADDR_REG, SELECT_CURSOR_HIGH);
+    outb(PORT_VGA_DATA_REG, cursor_location_high);
 }

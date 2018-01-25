@@ -36,10 +36,8 @@ typedef struct terminal
 {
     // Terminal buffer. Internal storage of the terminal content.
     unsigned char buffer[DEFAULT_TERMINAL_BUFFER_SIZE];
-
-    // Functionpointer to be used to synchronize the terminal with an external
-    // device. If set to NULL no synchronization will be attempted.
-    void (*putc)(char c, size_t x, size_t y);
+    void (*setc)(char c, size_t x, size_t y);
+    void (*set_cursor)(size_t x, size_t y);
 
     // Terminal attributes.
     size_t width;

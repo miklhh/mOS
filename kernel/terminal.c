@@ -22,8 +22,20 @@ void system_init_terminal()
     system_terminal.y = 0;
     system_terminal.width = DEFAULT_TERMINAL_WIDTH;
     system_terminal.height = DEFAULT_TERMINAL_HEIGHT;
-    system_terminal.putc = vga_putc;
+    system_terminal.setc = vga_putc;
+    system_terminal.set_cursor = vga_cursor_set_position;
     current_terminal = &system_terminal;
+
+    // Clear the terminal.
+    memset(system_terminal.buffer, 0, DEFAULT_TERMINAL_BUFFER_SIZE);
+    for (size_t y = 0; y < DEFAULT_TERMINAL_HEIGHT; ++y)
+    {
+        for (size_t x = 0; x < DEFAULT_TERMINAL_WIDTH; ++x)
+            current_terminal->setc((char)0, x, y);
+    }
+
+    // Reset the cursor in the terminal.
+    current_terminal->set_cursor(0, 0);
 }
 
 static inline bool special_character(char c)
@@ -34,7 +46,7 @@ static inline bool special_character(char c)
     return c_num < 31;
 }
 
-static terminal_handle_special_character(char c)
+static void terminal_handle_special_character(char c)
 {
     // Handle 'Carriage return', 'Line feed' and 'Newline'.
     const char CARRIAGE_RETURN = (char) 0x0D;
@@ -58,12 +70,12 @@ static terminal_handle_special_character(char c)
 }
 
 // Routine for puting a character to the current terminal.
-void terminal_putc(char c)
+static void terminal_putc_internal(char c)
 {
-    const size_t X = current_terminal->x;
-    const size_t Y = current_terminal->y;
-    const size_t TERMINAL_WIDTH = current_terminal->width;
-    const size_t TERMINAL_HEIGHT = current_terminal->height;
+    size_t x = current_terminal->x;
+    size_t y = current_terminal->y;
+    size_t terminal_width = current_terminal->width;
+    size_t terminal_height = current_terminal->height;
 
     if (special_character(c))
     {
@@ -73,17 +85,17 @@ void terminal_putc(char c)
     {
         // Put the character in the buffer and than try to synchronize it with the
         // synchronize routine.
-        current_terminal->buffer[Y * DEFAULT_TERMINAL_WIDTH + X] = c;
-        if (current_terminal->putc != NULL)
+        current_terminal->buffer[y * DEFAULT_TERMINAL_WIDTH + x] = c;
+        if (current_terminal->setc != NULL)
         {
-            current_terminal->putc(c, X, Y);
+            current_terminal->setc(c, x, y);
         }
 
         // Increment the terminal x and y position. Handle position overflows. 
-        if ( ++(current_terminal->x) > TERMINAL_WIDTH )
+        if ( ++(current_terminal->x) > terminal_width )
         {
             current_terminal->x = 0;
-            if ( ++(current_terminal->y) > TERMINAL_HEIGHT )
+            if ( ++(current_terminal->y) > terminal_height )
             {
                 terminal_scroll(1);
             }
@@ -91,11 +103,24 @@ void terminal_putc(char c)
     }
 }
 
+void terminal_putc(char c)
+{
+    terminal_putc_internal(c);
+    if (current_terminal->set_cursor != NULL)
+    {
+        current_terminal->set_cursor(current_terminal->x, current_terminal->y);
+    }
+}
+
 void terminal_puts(const char *str)
 {
     for (size_t i = 0; i < strlen(str); i++)
     {
-        terminal_putc(str[i]);
+        terminal_putc_internal(str[i]);
+    }
+    if (current_terminal->set_cursor != NULL)
+    {
+        current_terminal->set_cursor(current_terminal->x, current_terminal->y);
     }
 }
 
