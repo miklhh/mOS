@@ -3,6 +3,9 @@
 // This software is distributed under the MIT License.
 // See the file LICENSE for detailes.
 //
+// The terminal module is used to display text and data to the screen with the
+// VGA-unit.
+//
 
 #ifndef _TERMINAL_H
 #define _TERMINAL_H
@@ -12,7 +15,7 @@
 
 #define DEFAULT_TERMINAL_WIDTH              80
 #define DEFAULT_TERMINAL_HEIGHT             25
-#define DEFAULT_TERMINAL_BUFFER_SIZE        80 * 100
+#define DEFAULT_TERMINAL_BUFFER_SIZE        80 * 128
 
 // System terminal initialization routine. This routine will initialize the
 // system terminal and set the current terminal to the system terminal.
@@ -44,6 +47,7 @@ typedef struct terminal
     size_t height;
     size_t x;
     size_t y;
+    size_t buffer_size;
 } terminal_t;
 
 #endif

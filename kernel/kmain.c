@@ -34,25 +34,24 @@ void kmain(
     }
 
     // Print stack information.
-    kprintf("Kernel stack bottom: 0x%08x\n", stack_bottom);
-    kprintf("Kernel stack top:    0x%08x\n", stack_top);
-    kprintf("Kernel stack size:   0x%x\n", stack_top - stack_bottom);
+    kprintf("Kernel stack bottom: 0x%08x.\n", stack_bottom);
+    kprintf("Kernel stack top: 0x%08x.\n", stack_top);
+    kprintf("Kernel stack size: %u bytes.\n", stack_top - stack_bottom);
 
     // Acquire memory information.
-    if (!(info->flags & MULTIBOOT_INFO_MEMORY))
+    if ( !(info->flags & MULTIBOOT_INFO_MEMORY) )
     {
         kprintf("Error, no memory-info provided by bootloader.");
     }
     else
     {
-        uintptr_t mem_lower = info->mem_lower * 0x400;
-        uintptr_t mem_upper = info->mem_upper * 0x400;
-        kprintf("Memory lower: 0x%08x\n", mem_lower);
-        kprintf("Memory upper: 0x%08x\n", mem_upper);
+        kprintf("Memory lower: 0x%08x.\n", info->mem_lower * 0x400);
+        kprintf("Memory upper: 0x%08x.\n", info->mem_upper * 0x400);
+        kprintf("Available memory: %u kilo bytes.\n", info->mem_upper); 
     }
 
     // Acquire boot device
-    if (!(info->flags & MULTIBOOT_INFO_BOOTDEV))
+    if ( !(info->flags & MULTIBOOT_INFO_BOOTDEV) )
     {
         kprintf("Error, no boot-device-info provided by bootloader.");
     }
@@ -61,5 +60,7 @@ void kmain(
         kprintf("Root partition: 0x%x\n", info->boot_device);
     } 
 
+    terminal_scroll(1);
+    kprintf("Hello world!");
     while(1) { }
 }
