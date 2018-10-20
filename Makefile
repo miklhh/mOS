@@ -15,7 +15,7 @@ ASFLAGS := -felf32
 # Linker options
 LD := $(CROSSDIR)/i686-elf-gcc
 LIBS := -lgcc -lc
-LDFLAGS := -nostdlib -Tlinker/link.ld
+LDFLAGS := -nostdlib -Tlink.ld
 
 # Archiver options.
 AR := $(CROSSDIR)/i686-elf-ar

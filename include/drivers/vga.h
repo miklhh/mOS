@@ -39,6 +39,7 @@ void system_init_vga();
 // VGA routines.
 void vga_putchar(unsigned char character, uint8_t color, size_t x, size_t y);
 void vga_putc(char c, size_t x, size_t y);
+char vga_getc(size_t, size_t y);
 void vga_cursor_enable();
 void vga_cursor_disable();
 void vga_cursor_set_position(size_t x, size_t y);

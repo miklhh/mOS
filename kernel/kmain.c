@@ -61,6 +61,24 @@ void kmain(
     } 
 
     terminal_scroll(1);
+    kprintf("Hello world!\n");
+    kprintf("Hello world!\n");
+    kprintf("Hello world!\n");
+    kprintf("Hello world!\n");
+    kprintf("Hello world!\n");
+    kprintf("Hello world!\n");
+    kprintf("Hello world!\n");
+    kprintf("Hello world!\n");
+    kprintf("Hello world!\n");
+    kprintf("Hello world!\n");
+    kprintf("Hello world!\n");
+    kprintf("Hello world!\n");
+    kprintf("Hello world!\n");
+    kprintf("Hello world!\n");
+    kprintf("Hello world!\n");
+    kprintf("Hello world!\n");
+    kprintf("Hello world!\n");
+    kprintf("Hello world!\n");
     kprintf("Hello world!");
     while(1) { }
 }

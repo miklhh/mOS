@@ -46,6 +46,11 @@ void vga_putc(char c, size_t x, size_t y)
     vga_putchar((unsigned char)c, color, x, y);
 }
 
+char vga_getc(size_t x, size_t y)
+{
+    return (char)VIDEO_MEMORY[y * SCREEN_WIDTH + x];
+}
+
 // Enable the vga cursor.
 void vga_cursor_enable()
 {
