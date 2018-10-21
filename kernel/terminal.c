@@ -1,7 +1,7 @@
 // 
 // Part of mOS (Minimalistic Operating System).
 // This software is distributed under the MIT License.
-// See the file LICENSE for detailes.
+// See the file LICENSE for details.
 //
 
 #include <stdint.h>
@@ -107,8 +107,7 @@ void terminal_scroll(unsigned rows)
     }
 
     // Clear the newly freed lines.
-    unsigned y = DEFAULT_TERMINAL_HEIGHT - rows;
-    for (y; y < DEFAULT_TERMINAL_HEIGHT; ++y)
+    for (unsigned y = DEFAULT_TERMINAL_HEIGHT - rows; y < DEFAULT_TERMINAL_HEIGHT; ++y)
     {
         for (unsigned x = 0; x < DEFAULT_TERMINAL_WIDTH; ++x)
             put_char(' ', x, y);

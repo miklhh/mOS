@@ -1,6 +1,7 @@
-;
+; 
 ; Part of mOS (Minimalistic Operating System).
-; Code may freely be used under the MIT-license.
+; This software is distributed under the MIT License.
+; See the file LICENSE for details.
 ;
 
 MBALIGN     equ 1 << 0

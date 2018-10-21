@@ -20,6 +20,9 @@ void kmain(
     (void) info;
     (void) stack_bottom;
 
+    // Initialze GDT.
+    system_init_gdt();
+
     // Initialize VGA and kernel terminal.
     system_init_vga();
     system_init_terminal();
@@ -29,7 +32,7 @@ void kmain(
     {
         // PANIC!
         kprintf("Error: unsuccessful multiboot.\n");
-        kprintf("Expected boot magic: 0x%x vs acctual: 0x%x", 
+        kprintf("Expected boot magic: '0x%x' vs acctual: '0x%x'", 
                 MULTIBOOT_BOOTLOADER_MAGIC, magic);
     }
 
@@ -50,7 +53,7 @@ void kmain(
         kprintf("Available memory: %u kilo bytes.\n", info->mem_upper); 
     }
 
-    // Acquire boot device
+    // Acquire boot device.
     if ( !(info->flags & MULTIBOOT_INFO_BOOTDEV) )
     {
         kprintf("Error, no boot-device-info provided by bootloader.");
@@ -60,25 +63,5 @@ void kmain(
         kprintf("Root partition: 0x%x\n", info->boot_device);
     } 
 
-    terminal_scroll(1);
-    kprintf("Hello world!\n");
-    kprintf("Hello world!\n");
-    kprintf("Hello world!\n");
-    kprintf("Hello world!\n");
-    kprintf("Hello world!\n");
-    kprintf("Hello world!\n");
-    kprintf("Hello world!\n");
-    kprintf("Hello world!\n");
-    kprintf("Hello world!\n");
-    kprintf("Hello world!\n");
-    kprintf("Hello world!\n");
-    kprintf("Hello world!\n");
-    kprintf("Hello world!\n");
-    kprintf("Hello world!\n");
-    kprintf("Hello world!\n");
-    kprintf("Hello world!\n");
-    kprintf("Hello world!\n");
-    kprintf("Hello world!\n");
-    kprintf("Hello world!");
     while(1) { }
 }

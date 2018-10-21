@@ -24,8 +24,8 @@
 	replace outbyte(c) by your own function call.
 */
 
+// Bindings to make this printf implementation work with mOS.
 #include <terminal.h>
-
 #define putchar(c) terminal_putc(c)
 
 static void printchar(char **str, int c)

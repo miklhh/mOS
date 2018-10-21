@@ -1,7 +1,7 @@
 // 
 // Part of mOS (Minimalistic Operating System).
 // This software is distributed under the MIT License.
-// See the file LICENSE for detailes.
+// See the file LICENSE for details.
 //
 // The terminal module is used to display text and data to the screen with the
 // VGA-unit.
