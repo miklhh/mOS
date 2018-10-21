@@ -10,6 +10,8 @@
 #include <drivers/vga.h>
 #include <terminal.h>
 #include <kstdio.h>
+#include <string.h>
+#include <format_string.h>
 
 void kmain(
         struct multiboot_info *info, 
@@ -37,9 +39,9 @@ void kmain(
     }
 
     // Print stack information.
-    kprintf("Kernel stack bottom: 0x%08x.\n", stack_bottom);
-    kprintf("Kernel stack top: 0x%08x.\n", stack_top);
-    kprintf("Kernel stack size: %u bytes.\n", stack_top - stack_bottom);
+    char available_stack[10];
+    format_memory(available_stack, stack_top - stack_bottom);
+    kprintf("Kernel stack size: %s\n", available_stack);
 
     // Acquire memory information.
     if ( !(info->flags & MULTIBOOT_INFO_MEMORY) )
@@ -48,9 +50,9 @@ void kmain(
     }
     else
     {
-        kprintf("Memory lower: 0x%08x.\n", info->mem_lower * 0x400);
-        kprintf("Memory upper: 0x%08x.\n", info->mem_upper * 0x400);
-        kprintf("Available memory: %u kilo bytes.\n", info->mem_upper); 
+        char available_memory[10];
+        format_memory(available_memory, info->mem_upper * 0x400);
+        kprintf("Available memory: %s\n", available_memory);
     }
 
     // Acquire boot device.
