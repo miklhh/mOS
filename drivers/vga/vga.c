@@ -14,7 +14,7 @@ static const uint16_t PORT_VGA_ADDR_REG = 0x3D4;
 static const uint16_t PORT_VGA_DATA_REG = 0x3D5;
 static const unsigned int SCREEN_WIDTH = 80;
 static const unsigned int SCREEN_HEIGHT = 25;
-static uint16_t *const VIDEO_MEMORY = (uint16_t *) 0xB8000;
+static uint16_t *const VIDEO_MEMORY = (uint16_t *) 0xC00B8000;
 static bool initialized = false;
 
 // Static function for creating a 16-bit colorcoded character.

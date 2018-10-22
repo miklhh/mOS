@@ -63,7 +63,9 @@ void kmain(
     else
     {
         kprintf("Root partition: 0x%x\n", info->boot_device);
-    } 
+    }
+
+    kprintf("'kmain' location: 0x%x\n", (uintptr_t) kmain);
 
     while(1) { }
 }
