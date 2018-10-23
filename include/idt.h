@@ -13,6 +13,12 @@
 #define INTERUPT_GATE           0xE
 #define TRAP_GATE               0xF
 
+typedef struct __attribute__((pakced)) idt_descriptor
+{
+    uint16_t size;
+    uintptr_t offset;
+} idt_descriptor_t;
+
 uint64_t idt_create_entry(uintptr_t handler_offset, int dpl, int type, unsigned selector);
 
 #endif

@@ -83,7 +83,9 @@ drivers: $(DRIVER_OBJS)
 ####################
 .PHONY: kernel
 KERNEL_OBJS  = $(patsubst %.c,%.o,$(wildcard kernel/*.c))
+KERNEL_OBJS += $(patsubst %.c,%.o,$(wildcard kernel/isr/*.c))
 KERNEL_OBJS += $(patsubst %.asm,%.o,$(wildcard kernel/*.asm))
+KERNEL_OBJS += $(patsubst %.asm,%.o,$(wildcard kernel/isr/*.asm))
 kernel: $(KERNEL_OBJS)
 
 
@@ -108,6 +110,7 @@ clean-sysroot:
 	@-rm -rvf sysroot
 clean-objs:
 	@-rm -rv kernel/*.o
+	@-rm -rv kernel/isr/*.o
 clean-drivers:
 	@-rm -rv drivers/*/*.o
 clean-libc:
