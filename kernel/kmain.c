@@ -12,6 +12,7 @@
 #include <kstdio.h>
 #include <string.h>
 #include <format_string.h>
+#include <idt.h>
 
 void kmain(
         struct multiboot_info *info, 
@@ -66,6 +67,13 @@ void kmain(
     }
 
     kprintf("'kmain' location: 0x%x\n", (uintptr_t) kmain);
+
+    system_init_idt();
+    system_init_exceptions();
+    sti();
+
+    int i = 5 / 0;
+    kprintf("Ladida!");
 
     while(1) { }
 }

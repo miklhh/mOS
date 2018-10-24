@@ -4,10 +4,11 @@
 ; See the file LICENSE for details.
 ;
 
-; C prototype:
-; void load_gdt(const gdt_descriptor_t *ptr).
 
 section .text
+
+; C prototype:
+; void load_gdt(const gdt_descriptor_t *ptr)
 global load_gdt
 load_gdt:
     mov     eax, [esp + 4]
@@ -21,4 +22,12 @@ flush:
     mov     fs, ax
     mov     gs, ax
     mov     ss, ax
+    ret
+
+; C prototype:
+; void load_idt(const idt_descriptor_t *ptr)
+global load_idt
+load_idt:
+    mov     eax, [esp + 4]
+    lidt    [eax]
     ret

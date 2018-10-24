@@ -59,8 +59,8 @@ loader_virt:
     lea     ecx, [_start]
     jmp     ecx
 
-; -- Start symbol. This is the assembly entrypoint of the kernel. The previous
-; -- section ... should preserve the state of GRUB loading.
+; Start symbol. This is the assembly entrypoint of the kernel. The previous
+; section ... should preserve the state of GRUB loading.
 global _start
 _start:
     mov     dword[boot_page_directory], 0
@@ -80,3 +80,11 @@ hang:
     cli
     hlt
     jmp hang
+
+; Halt and shutdown routine. This routine will disable interrupts and spin
+; forever in order to freeze the system.
+global halt_and_shutdown
+halt_and_shutdown:
+    cli
+    hlt
+    jmp     halt_and_shutdown

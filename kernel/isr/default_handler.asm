@@ -11,8 +11,13 @@ isr_default_handler:
     extern  kprintf
     push    default_string
     call    kprintf
-    iret
+    add     esp, 0x04
+    iretd
+
+globale exception_default_handler
+exception_default_handler:
+    
 
 section .rodata
 default_string:
-    db  'Hello ISR world',0
+    db  'Default interrupt service routine called.',0x0A,0x00
