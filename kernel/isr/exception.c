@@ -13,9 +13,6 @@
 #define EXCEPTION_COUNT     32
 #define NULL                0
 
-// The low level exception handler.
-extern void exception_default_handler();
-
 // The 32 exception types.
 static const char *exception_name[EXCEPTION_COUNT] = {
     "Division by zero",
@@ -52,30 +49,26 @@ static const char *exception_name[EXCEPTION_COUNT] = {
 	"Reserved"
 };
 
-static void (*exception_routine[EXCEPTION_COUNT])(uint32_t error_code) = { 0 };
+static void (*exception_routine[EXCEPTION_COUNT])(struct regs *r) = { 0 };
 
 void system_init_exceptions()
 {
-    for (int i = 0; i < EXCEPTION_COUNT; ++i)
-    {
-        idt_add_isr(i, idt_create_descriptor(exception_default_handler, 0, INTERRUPT_GATE, 0x08));
-    }
+    extern void exception_default_handler_0();
+    idt_add_isr(0, idt_create_descriptor(exception_default_handler_0, 0, INTERRUPT_GATE, 0x08));
 }
 
 // The exception handler.
-void exception_handler(int vector, uint32_t error_code)
+void exception_handler(struct regs *r)
 {
-    // Test if there is a routine for the exception.
-    assert(vector < 32);
-    if ( (uintptr_t)exception_routine[vector] != NULL )
+    if ( (uintptr_t)exception_routine[r->int_no] != NULL )
     {
         // The exception routine exists, call it!
-        exception_routine[vector](error_code);
+        exception_routine[r->int_no](r);
     }
     else
     {
         // The exception does not exist. No going back from here...
-        kprintf("Unhandeled exception: [%d] %s.\n", vector, exception_name[vector]);
+        kprintf("Unhandeled exception: [%d] %s.\n", r->int_no, exception_name[r->int_no]);
         kprintf("This is a fatal error and the system will halt.");
         halt_and_shutdown();
     }

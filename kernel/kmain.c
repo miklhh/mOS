@@ -72,8 +72,6 @@ void kmain(
     system_init_exceptions();
     sti();
 
-    int i = 5 / 0;
-    kprintf("Ladida!");
-
+    volatile int hello = 5 / 0;
     while(1) { }
 }

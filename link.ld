@@ -1,4 +1,4 @@
-ENTRY(loader_phys)
+ENTRY(_loader)
 SECTIONS
 {
     . = 0xC0100000;
