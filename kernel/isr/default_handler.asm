@@ -59,9 +59,12 @@ exception_common:
     pop     fs                  ; Restore segment register.
     pop     es                  ;
     pop     ds
+
+    popa                        ; Cleanup all registers.
     add     esp, 8              ; Cleanup error code and handler number.
     iret                        ; Return from exception.
 
+; All the exception low level handlers.
 EXCEPTION_ISR_NOERR 0
 EXCEPTION_ISR_NOERR 1
 EXCEPTION_ISR_NOERR 2
@@ -94,3 +97,4 @@ EXCEPTION_ISR_NOERR 28
 EXCEPTION_ISR_NOERR 29
 EXCEPTION_ISR_NOERR 30
 EXCEPTION_ISR_NOERR 31
+

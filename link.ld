@@ -14,6 +14,7 @@ SECTIONS
     .data BLOCK(4K) : AT(ADDR(.data) - 0xC0000000) ALIGN(4K)
     {
         *(.data)
+        *(.symbols)
     }
     .bss BLOCK(4K) : AT(ADDR(.bss) - 0xC0000000) ALIGN(4K)
     {

@@ -72,6 +72,9 @@ void kmain(
     system_init_exceptions();
     sti();
 
-    volatile int hello = 5 / 0;
+    //asm("int $0x02");
+    asm("int $0x09");
+    asm("int $0x00");
+    
     while(1) { }
 }

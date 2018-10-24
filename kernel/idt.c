@@ -30,7 +30,6 @@ void system_init_idt()
     }
 
     // Load the IDT.
-    kprintf("Load IDT.\n");
     load_idt(&system_idt);
 }
 
@@ -38,7 +37,7 @@ void system_init_idt()
 // an interrupt/trap/task gate. It has to be an interrupt-routine with the
 // 'iretd' interrupt return. Only use extern forward decleard assembly interrupt
 // routines when creating new gates.
-uint64_t idt_create_descriptor(void (*handler)(void), uint8_t dpl, uint8_t type, uint16_t selector)
+uint64_t idt_create_descriptor(void (*handler)(void), uint8_t dpl, uint8_t type, uint16_t code_selector)
 {
     assert(dpl <= 4);
     assert(type == TASK_GATE || type == INTERRUPT_GATE || type == TRAP_GATE);
@@ -50,7 +49,7 @@ uint64_t idt_create_descriptor(void (*handler)(void), uint8_t dpl, uint8_t type,
     entry |= ((type == TASK_GATE) ? 1 << 12 : 0)    & 0x00001000;
     entry |= (((uint16_t) type) << 8)               & 0x00000F00;
     entry <<= 32;
-    entry |= (((uint32_t) selector) << 16)          & 0xFFFF0000;
+    entry |= (((uint32_t) code_selector) << 16)          & 0xFFFF0000;
     entry |= ((uintptr_t) handler)                  & 0x0000FFFF;
     return entry;
 }

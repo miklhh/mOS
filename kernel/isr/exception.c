@@ -53,8 +53,22 @@ static void (*exception_routine[EXCEPTION_COUNT])(struct regs *r) = { 0 };
 
 void system_init_exceptions()
 {
-    extern void exception_default_handler_0();
+    extern void exception_default_handler_0(); // Divide by zero error.
+    extern void exception_default_handler_1(); // Divide by zero error.
+    extern void exception_default_handler_2(); // Divide by zero error.
+    extern void exception_default_handler_9(); // Double fault.
     idt_add_isr(0, idt_create_descriptor(exception_default_handler_0, 0, INTERRUPT_GATE, 0x08));
+    idt_add_isr(1, idt_create_descriptor(exception_default_handler_1, 0, INTERRUPT_GATE, 0x08));
+    idt_add_isr(2, idt_create_descriptor(exception_default_handler_2, 0, INTERRUPT_GATE, 0x08));
+    idt_add_isr(9, idt_create_descriptor(exception_default_handler_9, 0, INTERRUPT_GATE, 0x08));
+
+    // Pseducode.
+    char symbol_name[30];
+    for (int i = 0; i < EXCEPTION_COUNT; ++i)
+    {
+        ksprintf(symbol_name, "exception_default_handler_%d", i);
+        //void (*handler)() = symbol_find(symbol_name);
+    }
 }
 
 // The exception handler.
@@ -68,8 +82,10 @@ void exception_handler(struct regs *r)
     else
     {
         // The exception does not exist. No going back from here...
-        kprintf("Unhandeled exception: [%d] %s.\n", r->int_no, exception_name[r->int_no]);
-        kprintf("This is a fatal error and the system will halt.");
+        kprintf("--------------------------------------------------------------------------------");
+        kprintf("    Unhandeled exception: [%d] '%s'.\n", r->int_no, exception_name[r->int_no]);
+        kprintf("    The system cannot recover from an unhandeled exception. Halting machine.\n");
+        kprintf("--------------------------------------------------------------------------------");
         halt_and_shutdown();
     }
 }
