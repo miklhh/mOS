@@ -42,7 +42,7 @@ exception_common:
     push    ds
     push    es                  ;
     push    fs                  ; Preserve segment registers.
-    push    ds                  ;
+    push    gs                  ;
     mov     ax, 0x10
     mov     ds, ax
     mov     es, ax              ;
@@ -82,7 +82,7 @@ EXCEPTION_ISR_ERR   13
 EXCEPTION_ISR_ERR   14
 EXCEPTION_ISR_NOERR 15
 EXCEPTION_ISR_NOERR 16
-EXCEPTION_ISR_NOERR 17
+EXCEPTION_ISR_ERR   17
 EXCEPTION_ISR_NOERR 18
 EXCEPTION_ISR_NOERR 19
 EXCEPTION_ISR_NOERR 20
@@ -95,6 +95,6 @@ EXCEPTION_ISR_NOERR 26
 EXCEPTION_ISR_NOERR 27
 EXCEPTION_ISR_NOERR 28
 EXCEPTION_ISR_NOERR 29
-EXCEPTION_ISR_NOERR 30
+EXCEPTION_ISR_ERR   30
 EXCEPTION_ISR_NOERR 31
 
