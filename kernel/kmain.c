@@ -71,10 +71,11 @@ void kmain(
     system_init_idt();
     system_init_exceptions();
     sti();
+    
+    volatile int i = 5;
+    volatile int j = 0;
+    i / j;
 
-    //asm("int $0x02");
-    asm("int $0x09");
-    asm("int $0x00");
     
     while(1) { }
 }
