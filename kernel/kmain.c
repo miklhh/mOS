@@ -76,7 +76,7 @@ void kmain(
     system_init_idt();
     system_init_exceptions();
     system_init_irq();
-    sti();
+    //sti();
 
     while(1) { }
 }
