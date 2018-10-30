@@ -2,6 +2,7 @@ ENTRY(_loader)
 SECTIONS
 {
     . = 0xC0100000;
+    __kernel_start = .;
     .text BLOCK(4K) : AT(ADDR(.text) - 0xC0000000) ALIGN(4K)
     {
         *(.multiboot)
@@ -21,5 +22,13 @@ SECTIONS
         *(COMMON)
         *(.bss)
     }
+    __kernel_end = .;
+
     /* Possible other sections go here. */
+    /DISCARD/ :
+    {
+        *(.comment)
+        *(.eh_frame)
+        *(.note.gnu.build-id)
+    }
 }

@@ -13,6 +13,7 @@
 #include <string.h>
 #include <format_string.h>
 #include <idt.h>
+#include <irq.h>
 
 void kmain(
         struct multiboot_info *info, 
@@ -39,15 +40,24 @@ void kmain(
                 MULTIBOOT_BOOTLOADER_MAGIC, magic);
     }
 
+    // Print kernel size.
+    extern uintptr_t __kernel_start;
+    extern uintptr_t __kernel_end;
+    char kernel_size[10];
+    format_memory(kernel_size, (uintptr_t)&__kernel_end - (uintptr_t)&__kernel_start);
+    kprintf("Kernel position: 0x%08x -> 0x%08x [%s]\n", &__kernel_start, &__kernel_end, kernel_size);
+
     // Print stack information.
-    char available_stack[10];
-    format_memory(available_stack, stack_top - stack_bottom);
-    kprintf("Kernel stack size: %s\n", available_stack);
+    char stack_size[10];
+    format_memory(stack_size, stack_top - stack_bottom);
+    kprintf("Kernel stack: 0x%08x -> 0x%08x [%s]\n", stack_bottom, stack_top, stack_size);
 
     // Acquire memory information.
     if ( !(info->flags & MULTIBOOT_INFO_MEMORY) )
     {
-        kprintf("Error, no memory-info provided by bootloader.");
+        kprintf("Fatal: No memory-info provided by bootloader.\n");
+        kprintf("The system cannot continue loading. Halting and shuting down.");
+        halt_and_shutdown();
     }
     else
     {
@@ -59,18 +69,14 @@ void kmain(
     // Acquire boot device.
     if ( !(info->flags & MULTIBOOT_INFO_BOOTDEV) )
     {
-        kprintf("Error, no boot-device-info provided by bootloader.");
-    }
-    else
-    {
-        kprintf("Root partition: 0x%x\n", info->boot_device);
+        kprintf("Notice: No boot-device-info provided by bootloader.");
     }
 
     kprintf("'kmain' location: 0x%x\n", (uintptr_t) kmain);
-
     system_init_idt();
     system_init_exceptions();
-    //sti();
+    system_init_irq();
+    sti();
 
     while(1) { }
 }

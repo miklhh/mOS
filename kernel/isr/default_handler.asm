@@ -4,6 +4,8 @@
 ; See the file LICENSE for details.
 ;
 
+
+; --- ISR default handler.
 section .text
 global isr_default_handler
 isr_default_handler:
@@ -19,6 +21,7 @@ default_string:
     db  'Default interrupt service routine called.',0x0A,0x00
 
 
+; --- Exception default handler.
 section .text
 %macro EXCEPTION_ISR_NOERR 1
     global exception_default_handler_%1
@@ -98,3 +101,59 @@ EXCEPTION_ISR_NOERR 29
 EXCEPTION_ISR_ERR   30
 EXCEPTION_ISR_NOERR 31
 
+
+; --- IRQ default handler.
+section .text
+%macro IRQ_ISR_NOERR 1
+    global irq_default_handler_%1
+    irq_default_handler_%1:
+        cli
+        push    0x00
+        push    %1
+        jmp     irq_common
+%endmacro
+
+; All the IRQ low level handlers
+IRQ_ISR_NOERR 32
+IRQ_ISR_NOERR 33
+IRQ_ISR_NOERR 34
+IRQ_ISR_NOERR 35
+IRQ_ISR_NOERR 36
+IRQ_ISR_NOERR 37
+IRQ_ISR_NOERR 38
+IRQ_ISR_NOERR 39
+IRQ_ISR_NOERR 40
+IRQ_ISR_NOERR 41
+IRQ_ISR_NOERR 42
+IRQ_ISR_NOERR 43
+IRQ_ISR_NOERR 44
+IRQ_ISR_NOERR 45
+IRQ_ISR_NOERR 46
+IRQ_ISR_NOERR 47
+
+irq_common:
+    pusha                       ; Push all general purpose registers.
+    push    ds
+    push    es                  ;
+    push    fs                  ; Preserve segment registers.
+    push    gs                  ;
+    mov     ax, 0x10
+    mov     ds, ax
+    mov     es, ax              ;
+    mov     fs, ax              ; Kernel data segment when handling exception.
+    mov     gs, ax              ;
+    cld
+
+    push    esp                 ; Push the 'struct regs *' argument being used.
+    extern  irq_handler
+    call    irq_handler         ; Call the high level exception handler.
+    add     esp, 4              ; Remove 'struct regs *' argument from stack.
+
+    pop     gs                  ;
+    pop     fs                  ; Restore segment register.
+    pop     es                  ;
+    pop     ds
+
+    popa                        ; Cleanup all registers.
+    add     esp, 8              ; Cleanup error code and handler number.
+    iret                        ; Return from exception.

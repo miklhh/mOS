@@ -9,6 +9,15 @@
 
 #include <stdint.h>
 
+#define IO_WAIT() \
+    do                                      \
+    {                                       \
+        asm volatile("jmp 1f        \n\t"   \
+                     "1:            \n\t"   \
+                     "    jmp 2f    \n\t"   \
+                     "2:                "); \
+    } while(0)
+
 uint8_t  inb  (uint16_t port);
 uint16_t inw  (uint16_t port);
 uint32_t inl  (uint16_t port);

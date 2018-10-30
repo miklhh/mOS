@@ -16,7 +16,7 @@ extern void system_init_terminal();
 extern void system_init_gdt();
 extern void system_init_idt();
 extern void system_init_exceptions();
-// extern void system_init_irq();
+ extern void system_init_irq();
 // extern void system_init_pit();
 
 // Halt and shutdown routine. Calling this routine will dissable intterupts and
