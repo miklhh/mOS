@@ -7,7 +7,7 @@
 #include <gdt.h>
 #include <stdint.h>
 
-#define DESCRIPTOR_SEGMENTS 3
+#define DESCRIPTOR_SEGMENTS 6
 
 static uint64_t system_gdt_entries[DESCRIPTOR_SEGMENTS];
 static gdt_descriptor_t system_gdtd;
@@ -18,12 +18,18 @@ void system_init_gdt()
     // - NULL descriptor.                     Offset: 0x00
     // - Code segment descriptor for kernel.  Offset: 0x08
     // - Data segment descriptor for kernel.  Offset: 0x10
-    // - A TSS segment.                       Offset: 0x18
+    // - Code segment descriptor for user.    Offset: 0x18
+    // - Data segment descriptor for user.    Offset: 0x20
+    // - A TSS segment.                       Offset: 0x28
     uint8_t cs_kernel = (ACCESS_PRESENT | ACCESS_PRIVL(0) | ACCESS_R_W | ACCESS_EXECUTE);
     uint8_t ds_kernel = (ACCESS_PRESENT | ACCESS_PRIVL(0) | ACCESS_R_W);
+    uint8_t cs_user   = (ACCESS_PRESENT | ACCESS_PRIVL(3) | ACCESS_R_W | ACCESS_EXECUTE);
+    uint8_t ds_user   = (ACCESS_PRESENT | ACCESS_PRIVL(3) | ACCESS_R_W);
     system_gdt_entries[0] = 0;
     system_gdt_entries[1] = create_gdt_entry(0x0, 0x000fffff, cs_kernel);
     system_gdt_entries[2] = create_gdt_entry(0x0, 0x000fffff, ds_kernel);
+    system_gdt_entries[3] = create_gdt_entry(0x0, 0x000fffff, cs_user);
+    system_gdt_entries[4] = create_gdt_entry(0x0, 0x000fffff, ds_user);
 
     system_gdtd.size = sizeof(uint64_t) * DESCRIPTOR_SEGMENTS - 1;
     system_gdtd.offset = (uintptr_t) system_gdt_entries;
