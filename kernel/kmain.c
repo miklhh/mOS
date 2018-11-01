@@ -14,6 +14,7 @@
 #include <format_string.h>
 #include <idt.h>
 #include <irq.h>
+#include <io.h>
 
 void kmain(
         struct multiboot_info *info, 
@@ -76,7 +77,11 @@ void kmain(
     system_init_idt();
     system_init_exceptions();
     system_init_irq();
+    system_init_pit();
     sti();
 
-    while(1) { }
+    while(1) 
+    { 
+        asm("hlt");
+    }
 }
