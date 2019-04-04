@@ -104,7 +104,7 @@ void system_init_irq()
     outb(MASTER_PIC_DATA, a1);
     outb(SLAVE_PIC_DATA,  a2);
 
-    // Forgive me father, for I have sinned. Beyond this point, there is only
+    // Forgive me father, for I have sinned. Beyond this point, lyes is only
     // wrath and fear to be found. No one should have to witness this, ever.
     // The deadliest of sins 'code duplication' is unforgivable.
     // Forgive me father, for I have sinned...

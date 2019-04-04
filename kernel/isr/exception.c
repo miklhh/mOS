@@ -62,6 +62,7 @@ void exception_handler(struct regs *r)
     else
     {
         // The exception does not exist. No going back from here...
+        kprintf("\n");
         kprintf("--------------------------------------------------------------------------------");
         kprintf("    Unhandeled exception: [%d] '%s'.\n", r->int_no, exception_name[r->int_no]);
         kprintf("    The system cannot recover from an unhandeled exception. Halting machine.\n\n");
@@ -77,6 +78,10 @@ void exception_handler(struct regs *r)
 
 void system_init_exceptions()
 {
+    // Add exception handlers.
+    extern void page_fault_handler(struct regs *r);
+    exception_routine[14] = page_fault_handler;
+
     // Forgive me father, for I have sinned. Beyond this point, there is only
     // wrath and fear to be found. No one should have to witness this, ever.
     // The deadliest of sins 'code duplication' is unforgivable.

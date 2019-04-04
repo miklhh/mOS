@@ -15,6 +15,9 @@
 // ISR for timer.
 static void pit_isr(struct regs *s)
 {
+    (void) s;
+
+    // Funny little clocky thingy.
     static int counter = 0;
     static int hour = 23, minute = 59, second = 59;
     if (counter == 0)

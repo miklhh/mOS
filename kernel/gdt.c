@@ -31,6 +31,7 @@ void system_init_gdt()
     system_gdt_entries[3] = create_gdt_entry(0x0, 0x000fffff, cs_user);
     system_gdt_entries[4] = create_gdt_entry(0x0, 0x000fffff, ds_user);
 
+    // Load the global descriptor table.
     system_gdtd.size = sizeof(uint64_t) * DESCRIPTOR_SEGMENTS - 1;
     system_gdtd.offset = (uintptr_t) system_gdt_entries;
     load_gdt(&system_gdtd);

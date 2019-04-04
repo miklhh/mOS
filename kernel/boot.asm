@@ -24,53 +24,36 @@ stack_bottom:
 resb 32768
 stack_top:
 
-; This section contains the page directory of the kernel. The table contains two
-; active 4-MB pages, one for identity mapping the first 4 MB and one for mapping 
-; (virtual) 0xC0000000 to (physical) 0x00000000 (4 MB). This table will only be
-; used when setting up the system.
-KERNEL_VIRTUAL_BASE     equ 0xC0000000
+; This section (USED TO) contain the page directory of the kernel. The table 
+; contains two active 4-MB pages, one for identity mapping the first 4 MB and 
+; one for mapping (virtual) 0xC0000000 to (physical) 0x00000000 (4 MB). This 
+; table will only be used when setting up the system.
+KERNEL_VIRTUAL_BASE     equ 0x00000000
 KERNEL_PAGE_NUMBER      equ (KERNEL_VIRTUAL_BASE >> 22)
 
 section .data
 align 0x1000
-boot_page_directory:
-    dd      0x00000083
-    times   (KERNEL_PAGE_NUMBER - 1) dd 0
-    dd      0x00000083
-    times   (1024 - KERNEL_PAGE_NUMBER - 3) dd 0
+; Possible data goes here...
 
 
 section .text
 global _loader
 _loader:
-    ; Load the page directory. Adjust for physical addresses.
-    mov     ecx, (boot_page_directory - KERNEL_VIRTUAL_BASE)
-    mov     cr3, ecx                        ; Load page directory (adjusted).
-    mov     ecx, cr4                        ; Fetch CR4.
-    or      ecx, 0x00000010                 ; Set 'PSE' bit CR4.
-    mov     cr4, ecx                        ; Store store result in CR4.
-    mov     ecx, cr0                        ; Fetch CR0.
-    or      ecx, 0x80000000                 ; Set 'Page enalbe' bit.
-    mov     cr0, ecx                        ; Enable paging.
-
-    lea     ecx, [_start]                   ; Paging is enable beyond this point.
-    jmp     ecx                             ; Jump to the kernel entry.
+    lea     ecx, [_start]             ; Paging used to be here. Oh well.
+    jmp     ecx                       ; Jump to the kernel entry.
 
 
 global _start
 _start:
-    mov     dword[boot_page_directory], 0
-    invlpg  [0]                             ; Invalidate the identity mapping of first 4 MB.
-
-    cli                                     ; Clear interrupt flag.
-    add     ebx, KERNEL_VIRTUAL_BASE        ; Adjust for virtual address.
-    mov     esp, stack_top                  ; Setup the kernel stack.
-    push    esp                             ; kmain parameter 4: 'uintptr_t stack_top'.
-    push    stack_bottom                    ; kmain parameter 3: 'uintptr_t stack_bottom'. 
-    push    eax                             ; kmain parameter 2: 'uint32_t multiboot_magic'.
-    push    ebx                             ; kmail parameter 1: 'struct multiboot_info *info'.
-    extern  kmain                           ; Prepare to invoke kernel main function.
-    call    kmain                           ; Invoke kernel main function.
+    cli                               ; Clear interrupt flag.
+    add     ebx, KERNEL_VIRTUAL_BASE  ; Adjust for virtual address.
+    mov     esp, stack_top            ; Setup the kernel stack.
+    push    esp                       ; kmain parameter 4: 'uintptr_t stack_top'.
+    push    stack_bottom              ; kmain parameter 3: 'uintptr_t stack_bottom'. 
+    push    eax                       ; kmain parameter 2: 'uint32_t multiboot_magic'.
+    push    ebx                       ; kmail parameter 1: 'struct multiboot_info *info'.
+    extern  kmain                     ; Prepare to invoke kernel main function.
+    call    kmain                     ; Invoke kernel main function.
 
 hang:
     cli
@@ -82,6 +65,6 @@ hang:
 ; forever in order to freeze the system.
 global halt_and_shutdown
 halt_and_shutdown:
-    cli
-    hlt
-    jmp     halt_and_shutdown
+    cli                               ; In case of HaS, clear interrupt flag...
+    hlt                               ; and halt the machine.
+    jmp     halt_and_shutdown         ; Jump back in case of NMI.

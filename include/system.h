@@ -9,7 +9,7 @@
 
 #include <stdint.h>
 
-// System initialization routines. Preferably, the should get called in this
+// System initialization routines. Preferably, they should get called in this
 // perticular order.
 extern void system_init_vga();
 extern void system_init_terminal();
@@ -18,10 +18,13 @@ extern void system_init_idt();
 extern void system_init_exceptions();
 extern void system_init_irq();
 extern void system_init_pit();
+extern void system_init_kalloc();
+extern void system_init_paging(unsigned mem_size);
+extern void system_init_heap(uintptr_t mem_end);
 
 // Halt and shutdown routine. Calling this routine will dissable intterupts and
 // halt the processor. There is no going back from this.
-extern void halt_and_shutdown();
+extern void __attribute__((noreturn)) halt_and_shutdown();
 
 struct regs
 {

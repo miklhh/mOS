@@ -8,7 +8,7 @@
 
 size_t strlen(const char *str)
 {
-    char null = (char) 0;
+    const char null = (char) 0;
     size_t len = 0;
     while (str[len] != null)
     {

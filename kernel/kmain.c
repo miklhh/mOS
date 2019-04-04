@@ -15,6 +15,9 @@
 #include <idt.h>
 #include <irq.h>
 #include <io.h>
+#include <memory/kalloc.h>
+#include <assert.h>
+
 
 void kmain(
         struct multiboot_info *info, 
@@ -37,8 +40,7 @@ void kmain(
     {
         // PANIC!
         kprintf("Error: unsuccessful multiboot.\n");
-        kprintf("Expected boot magic: '0x%x' vs acctual: '0x%x'", 
-                MULTIBOOT_BOOTLOADER_MAGIC, magic);
+        kprintf("Expected boot magic: '0x%x' vs acctual: '0x%x'", MULTIBOOT_BOOTLOADER_MAGIC, magic);
     }
 
     // Print kernel size.
@@ -46,25 +48,30 @@ void kmain(
     extern uintptr_t __kernel_end;
     char kernel_size[10];
     format_memory(kernel_size, (uintptr_t)&__kernel_end - (uintptr_t)&__kernel_start);
-    kprintf("Kernel position: 0x%08x -> 0x%08x [%s]\n", &__kernel_start, &__kernel_end, kernel_size);
+    kprintf("Kernel position:      0x%08x -> 0x%08x [%s]\n", 
+            &__kernel_start, &__kernel_end, kernel_size);
 
     // Print stack information.
     char stack_size[10];
     format_memory(stack_size, stack_top - stack_bottom);
-    kprintf("Kernel stack: 0x%08x -> 0x%08x [%s]\n", stack_bottom, stack_top, stack_size);
+    kprintf("Kernel stack:         0x%08x -> 0x%08x [%s]\n", 
+            stack_bottom, stack_top, stack_size);
 
     // Acquire memory information.
     if ( !(info->flags & MULTIBOOT_INFO_MEMORY) )
     {
         kprintf("Fatal: No memory-info provided by bootloader.\n");
-        kprintf("The system cannot continue loading. Halting and shuting down.");
+        kprintf("The system cannot continue. Halting and shuting down.");
         halt_and_shutdown();
     }
     else
     {
         char available_memory[10];
         format_memory(available_memory, info->mem_upper * 0x400);
-        kprintf("Available memory: %s\n", available_memory);
+        kprintf("Available memory:     0x%08x -> 0x%08x [%s]\n", 
+                0x00100000, 
+                0x00100000 + info->mem_upper*0x400, 
+                available_memory);
     }
 
     // Acquire boot device.
@@ -73,13 +80,20 @@ void kmain(
         kprintf("Notice: No boot-device-info provided by bootloader.");
     }
 
-    kprintf("'kmain' location: 0x%x\n", (uintptr_t) kmain);
+    // Initialze Interrupts & Co.
     system_init_idt();
     system_init_exceptions();
     system_init_irq();
     system_init_pit();
-    sti();
 
+    // Initialze kernel heap allocation system. 
+    system_init_kalloc();
+
+    // Initialze paging and finalize the heap allocation system.
+    system_init_paging(info->mem_upper * 0x400);
+    system_init_heap(info->mem_upper * 0x400 + 0x100000);
+
+    sti();
     while(1) 
     { 
         asm("hlt");

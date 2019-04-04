@@ -1,23 +1,23 @@
 ENTRY(_loader)
 SECTIONS
 {
-    . = 0xC0100000;
+    . = 0x00100000;
     __kernel_start = .;
-    .text BLOCK(4K) : AT(ADDR(.text) - 0xC0000000) ALIGN(4K)
+    .text BLOCK(4K) : AT(ADDR(.text) - 0x00000000) ALIGN(4K)
     {
         *(.multiboot)
         *(.text)
     }
-    .rodata BLOCK(4K) : AT(ADDR(.rodata) - 0xC0000000) ALIGN(4K)
+    .rodata BLOCK(4K) : AT(ADDR(.rodata) - 0x00000000) ALIGN(4K)
     {
         *(.rodata)
     }
-    .data BLOCK(4K) : AT(ADDR(.data) - 0xC0000000) ALIGN(4K)
+    .data BLOCK(4K) : AT(ADDR(.data) - 0x00000000) ALIGN(4K)
     {
         *(.data)
         *(.symbols)
     }
-    .bss BLOCK(4K) : AT(ADDR(.bss) - 0xC0000000) ALIGN(4K)
+    .bss BLOCK(4K) : AT(ADDR(.bss) - 0x00000000) ALIGN(4K)
     {
         *(COMMON)
         *(.bss)
