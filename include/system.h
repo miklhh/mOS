@@ -18,7 +18,7 @@ extern void system_init_idt();
 extern void system_init_exceptions();
 extern void system_init_irq();
 extern void system_init_pit();
-extern void system_init_kalloc();
+extern void system_init_kalloc(uintptr_t mem_start);
 extern void system_init_paging(unsigned mem_size);
 extern void system_init_heap(uintptr_t mem_end);
 

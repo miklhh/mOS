@@ -8,9 +8,14 @@
 #define _KALLOC_H
 
 #include <memory/heap_allocator/heap.h>
+#include <multiboot.h>
+#include <stdint.h>
 
 // Routine for initialzeing the kernel allocation system.
-void system_init_kalloc();
+void system_init_kalloc(uintptr_t mem_start);
+
+// Routine for aqcuiering the end of all bootloaded content.
+uintptr_t get_kalloc_start(struct multiboot_info *info);
 
 // Routine called to switch malloc from placement allocation to heap allocation.
 uintptr_t heap_install();

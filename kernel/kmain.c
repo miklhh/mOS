@@ -15,6 +15,7 @@
 #include <idt.h>
 #include <irq.h>
 #include <io.h>
+#include <module.h>
 #include <memory/kalloc.h>
 #include <assert.h>
 
@@ -86,12 +87,22 @@ void kmain(
     system_init_irq();
     system_init_pit();
 
-    // Initialze kernel heap allocation system. 
-    system_init_kalloc();
+    // Initialize kernel dynamic allocation system. It should be initialzed to
+    // start directly after the last module was loaded.
+    system_init_kalloc(get_kalloc_start(info));
 
     // Initialze paging and finalize the heap allocation system.
     system_init_paging(info->mem_upper * 0x400);
     system_init_heap(info->mem_upper * 0x400 + 0x100000);
+
+
+    // Testing module.
+    system_init_modules(info->flags, info->mods_addr, info->mods_count);
+    kprintf("info->flags & MULTIBOOT_INFO_MODS = %d\n", info->flags & MULTIBOOT_INFO_MODS);
+    kprintf("info->mods_count = %d\n", info->mods_count);
+    kprintf("info->mods_addr = %d\n", info->mods_addr);
+    //kprintf("Error, could not load module.");
+    halt_and_shutdown();
 
     sti();
     while(1) 

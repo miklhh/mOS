@@ -86,68 +86,42 @@ void system_init_exceptions()
     // wrath and fear to be found. No one should have to witness this, ever.
     // The deadliest of sins 'code duplication' is unforgivable.
     // Forgive me father, for I have sinned...
-    extern void exception_default_handler_0();
-    extern void exception_default_handler_1();
-    extern void exception_default_handler_2();
-    extern void exception_default_handler_3();
-    extern void exception_default_handler_4();
-    extern void exception_default_handler_5();
-    extern void exception_default_handler_6();
-    extern void exception_default_handler_7();
-    extern void exception_default_handler_8();
-    extern void exception_default_handler_9();
-    extern void exception_default_handler_10();
-    extern void exception_default_handler_11();
-    extern void exception_default_handler_12();
-    extern void exception_default_handler_13();
-    extern void exception_default_handler_14();
-    extern void exception_default_handler_15();
-    extern void exception_default_handler_16();
-    extern void exception_default_handler_17();
-    extern void exception_default_handler_18();
-    extern void exception_default_handler_19();
-    extern void exception_default_handler_20();
-    extern void exception_default_handler_21();
-    extern void exception_default_handler_22();
-    extern void exception_default_handler_23();
-    extern void exception_default_handler_24();
-    extern void exception_default_handler_25();
-    extern void exception_default_handler_26();
-    extern void exception_default_handler_27();
-    extern void exception_default_handler_28();
-    extern void exception_default_handler_29();
-    extern void exception_default_handler_30();
-    extern void exception_default_handler_31();
-    idt_add_isr(0,  idt_create_descriptor(exception_default_handler_0,   0, INTERRUPT_GATE, 0x08));
-    idt_add_isr(1,  idt_create_descriptor(exception_default_handler_1,   0, INTERRUPT_GATE, 0x08));
-    idt_add_isr(2,  idt_create_descriptor(exception_default_handler_2,   0, INTERRUPT_GATE, 0x08));
-    idt_add_isr(3,  idt_create_descriptor(exception_default_handler_3,   0, INTERRUPT_GATE, 0x08));
-    idt_add_isr(4,  idt_create_descriptor(exception_default_handler_4,   0, INTERRUPT_GATE, 0x08));
-    idt_add_isr(5,  idt_create_descriptor(exception_default_handler_5,   0, INTERRUPT_GATE, 0x08));
-    idt_add_isr(6,  idt_create_descriptor(exception_default_handler_6,   0, INTERRUPT_GATE, 0x08));
-    idt_add_isr(7,  idt_create_descriptor(exception_default_handler_7,   0, INTERRUPT_GATE, 0x08));
-    idt_add_isr(8,  idt_create_descriptor(exception_default_handler_8,   0, INTERRUPT_GATE, 0x08));
-    idt_add_isr(9,  idt_create_descriptor(exception_default_handler_9,   0, INTERRUPT_GATE, 0x08));
-    idt_add_isr(10, idt_create_descriptor(exception_default_handler_10,  0, INTERRUPT_GATE, 0x08));
-    idt_add_isr(11, idt_create_descriptor(exception_default_handler_11,  0, INTERRUPT_GATE, 0x08));
-    idt_add_isr(12, idt_create_descriptor(exception_default_handler_12,  0, INTERRUPT_GATE, 0x08));
-    idt_add_isr(13, idt_create_descriptor(exception_default_handler_13,  0, INTERRUPT_GATE, 0x08));
-    idt_add_isr(14, idt_create_descriptor(exception_default_handler_14,  0, INTERRUPT_GATE, 0x08));
-    idt_add_isr(15, idt_create_descriptor(exception_default_handler_15,  0, INTERRUPT_GATE, 0x08));
-    idt_add_isr(16, idt_create_descriptor(exception_default_handler_16,  0, INTERRUPT_GATE, 0x08));
-    idt_add_isr(17, idt_create_descriptor(exception_default_handler_17,  0, INTERRUPT_GATE, 0x08));
-    idt_add_isr(18, idt_create_descriptor(exception_default_handler_18,  0, INTERRUPT_GATE, 0x08));
-    idt_add_isr(19, idt_create_descriptor(exception_default_handler_19,  0, INTERRUPT_GATE, 0x08));
-    idt_add_isr(20, idt_create_descriptor(exception_default_handler_20,  0, INTERRUPT_GATE, 0x08));
-    idt_add_isr(21, idt_create_descriptor(exception_default_handler_21,  0, INTERRUPT_GATE, 0x08));
-    idt_add_isr(22, idt_create_descriptor(exception_default_handler_22,  0, INTERRUPT_GATE, 0x08));
-    idt_add_isr(23, idt_create_descriptor(exception_default_handler_23,  0, INTERRUPT_GATE, 0x08));
-    idt_add_isr(24, idt_create_descriptor(exception_default_handler_24,  0, INTERRUPT_GATE, 0x08));
-    idt_add_isr(25, idt_create_descriptor(exception_default_handler_25,  0, INTERRUPT_GATE, 0x08));
-    idt_add_isr(26, idt_create_descriptor(exception_default_handler_26,  0, INTERRUPT_GATE, 0x08));
-    idt_add_isr(27, idt_create_descriptor(exception_default_handler_27,  0, INTERRUPT_GATE, 0x08));
-    idt_add_isr(28, idt_create_descriptor(exception_default_handler_28,  0, INTERRUPT_GATE, 0x08));
-    idt_add_isr(29, idt_create_descriptor(exception_default_handler_29,  0, INTERRUPT_GATE, 0x08));
-    idt_add_isr(30, idt_create_descriptor(exception_default_handler_30,  0, INTERRUPT_GATE, 0x08));
-    idt_add_isr(31, idt_create_descriptor(exception_default_handler_31,  0, INTERRUPT_GATE, 0x08));
+    
+    #define CREATE_DEFAULT_HANDLER(NR)                     \
+        { extern void exception_default_handler_ ## NR();  \
+          idt_add_isr(NR,  idt_create_descriptor(          \
+                      exception_default_handler_ ## NR,    \
+                      0, INTERRUPT_GATE, 0x08)); }
+    CREATE_DEFAULT_HANDLER(0);
+    CREATE_DEFAULT_HANDLER(1);
+    CREATE_DEFAULT_HANDLER(2);
+    CREATE_DEFAULT_HANDLER(3);
+    CREATE_DEFAULT_HANDLER(4);
+    CREATE_DEFAULT_HANDLER(5);
+    CREATE_DEFAULT_HANDLER(6);
+    CREATE_DEFAULT_HANDLER(7);
+    CREATE_DEFAULT_HANDLER(8);
+    CREATE_DEFAULT_HANDLER(9);
+    CREATE_DEFAULT_HANDLER(10);
+    CREATE_DEFAULT_HANDLER(11);
+    CREATE_DEFAULT_HANDLER(12);
+    CREATE_DEFAULT_HANDLER(13);
+    CREATE_DEFAULT_HANDLER(14);
+    CREATE_DEFAULT_HANDLER(15);
+    CREATE_DEFAULT_HANDLER(16);
+    CREATE_DEFAULT_HANDLER(17);
+    CREATE_DEFAULT_HANDLER(18);
+    CREATE_DEFAULT_HANDLER(19);
+    CREATE_DEFAULT_HANDLER(20);
+    CREATE_DEFAULT_HANDLER(21);
+    CREATE_DEFAULT_HANDLER(22);
+    CREATE_DEFAULT_HANDLER(23);
+    CREATE_DEFAULT_HANDLER(24);
+    CREATE_DEFAULT_HANDLER(25);
+    CREATE_DEFAULT_HANDLER(26);
+    CREATE_DEFAULT_HANDLER(27);
+    CREATE_DEFAULT_HANDLER(28);
+    CREATE_DEFAULT_HANDLER(29);
+    CREATE_DEFAULT_HANDLER(30);
+    CREATE_DEFAULT_HANDLER(31);
 }

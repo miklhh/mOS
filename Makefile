@@ -32,7 +32,7 @@ AR := $(CROSSDIR)/i686-elf-ar
 #       ALL        #
 ####################
 .PHONY: all
-all: sysroot headers libc drivers kernel bin
+all: sysroot headers libc drivers modules kernel bin os.iso
 
 
 ###################
@@ -46,7 +46,8 @@ sysroot:
 	mkdir -p $(SYSROOT)/usr
 	mkdir -p $(SYSROOT)/usr/lib
 	mkdir -p $(SYSROOT)/usr/include
-	cp kernel/grub.cfg $(SYSROOT)/boot/grub
+	mkdir -p $(SYSROOT)/modules
+	cp kernel/grub.cfg $(SYSROOT)/boot/grub/
 
 
 ####################
@@ -90,6 +91,12 @@ KERNEL_OBJS += $(patsubst %.asm,%.o,$(wildcard kernel/*.asm))
 KERNEL_OBJS += $(patsubst %.asm,%.o,$(wildcard kernel/isr/*.asm))
 kernel: $(KERNEL_OBJS)
 
+###################
+#     MODULES     #
+###################
+.PHONY: modules
+modules:
+	nasm -fbin modules/test.asm -o sysroot/modules/test
 
 ####################
 #     BIN/ELF      #
@@ -101,13 +108,19 @@ elf: sysroot headers kernel drivers libc
 	$(LD) $(CCSETSYSROOT) $(LDFLAGS) $(OBJS) $(LIBS) -o $(SYSROOT)/boot/$(FILENAME)
 bin: elf
 
+####################
+#       ISO        #
+####################
+os.iso: bin
+	grub-mkrescue sysroot/ -o os.iso
+
 
 ####################
 #      CLEAN       #
 ####################
 .PHONY: clean clean-all clean-sysroot clean-objs clean-drivers
 clean: clean-all
-clean-all: clean-sysroot clean-objs clean-drivers clean-libc
+clean-all: clean-sysroot clean-objs clean-drivers clean-libc clean-iso
 clean-sysroot:
 	@-rm -rvf sysroot
 clean-objs:
@@ -119,3 +132,5 @@ clean-drivers:
 	@-rm -rv drivers/*/*.o
 clean-libc:
 	@-rm -rv libc/*.o
+clean-iso:
+	@-rm -rv os.iso
