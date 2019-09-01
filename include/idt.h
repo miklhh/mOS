@@ -13,6 +13,12 @@
 #define INTERRUPT_GATE          0xE
 #define TRAP_GATE               0xF
 
+enum intr_level
+{
+    INTR_OFF,
+    INTR_ON
+};
+
 // Routine for activating the IDT machinery.
 void system_init_idt();
 
@@ -35,7 +41,17 @@ extern void load_idt(const idt_descriptor_t *ptr);
 
 // Inline functions for activating and deactivating interrupts.
 static inline void sti() { asm("sti"); }
-static inline void cli() { asm("cli"); }
+static inline void cli() { asm("cli" : : : "memory"); }
+
+// More detaild interrupt enablers/dissablers. All functions return interrupt
+// status before invocation.
+enum intr_level intr_get_level();
+enum intr_level intr_disable();
+enum intr_level intr_enable();
+enum intr_level intr_set_level(enum intr_level level);
+
+// In the context of an interrupt, this function returs true if called from
+// withing and IRQ or false otherwise.
+int intr_context();
 
 #endif
-

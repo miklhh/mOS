@@ -11,9 +11,13 @@
 #include <system.h>
 #include <kstdio.h>
 #include <assert.h>
+#include <thread.h>
 
 #define IRQ_COUNT       16
 #define NULL            0
+
+// Flag for routine to ask for yield on return.
+static int yield_on_return;
 
 // Send End-of-interrupt to the slave of master PIC device.
 void irq_send_eoi(uint8_t irq)
@@ -23,6 +27,12 @@ void irq_send_eoi(uint8_t irq)
         outb(SLAVE_PIC_COMMAND, PIC_EOI);
     }
     outb(MASTER_PIC_COMMAND, PIC_EOI);
+}
+
+// Set the yield on return flag.
+void set_yield_on_return_flag()
+{
+    yield_on_return = 1;
 }
 
 // Array of IRQ routines.
@@ -51,7 +61,9 @@ void irq_handler(struct regs *r)
         }
         else
         {
-            // The routine exists. Call it.
+            // The routine exists, call it. The routine might set the yield on
+            // return flag, if so we have to yield later.
+            yield_on_return = 0;
             irq_routine[r->int_no - 32](r);
         }
         irq_send_eoi(r->int_no - 32);
@@ -72,6 +84,11 @@ void irq_handler(struct regs *r)
         kprintf("--------------------------------------------------------------------------------");
         halt_and_shutdown();
     }
+
+    // If the handler set the yield on return flag, we should yield here before
+    // we return.
+    if (yield_on_return)
+        thread_yield();
 
     // Set interrupt flag again.
     sti();

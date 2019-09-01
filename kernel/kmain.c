@@ -16,8 +16,22 @@
 #include <irq.h>
 #include <io.h>
 #include <module.h>
+#include <thread.h>
 #include <memory/kalloc.h>
 #include <assert.h>
+
+static void kmain2(void *aux)
+{
+    (void) aux;
+
+    volatile int i = 0;
+    while(1)
+    {
+        for (i; i < 40000000; ++i) { }
+        kprintf("Call from: %s\n", thread_current()->name);
+        i = 0;
+    }
+}
 
 
 void kmain(
@@ -39,9 +53,10 @@ void kmain(
     // Test for successful multiboot.
     if (magic != MULTIBOOT_BOOTLOADER_MAGIC)
     {
-        // PANIC!
+        // Multiboot failure.
         kprintf("Error: unsuccessful multiboot.\n");
         kprintf("Expected boot magic: '0x%x' vs acctual: '0x%x'", MULTIBOOT_BOOTLOADER_MAGIC, magic);
+        halt_and_shutdown();
     }
 
     // Print kernel size.
@@ -52,7 +67,7 @@ void kmain(
     kprintf("Kernel position:      0x%08x -> 0x%08x [%s]\n", 
             &__kernel_start, &__kernel_end, kernel_size);
 
-    // Print stack information.
+    // Print kernel stack information.
     char stack_size[10];
     format_memory(stack_size, stack_top - stack_bottom);
     kprintf("Kernel stack:         0x%08x -> 0x%08x [%s]\n", 
@@ -75,17 +90,31 @@ void kmain(
                 available_memory);
     }
 
-    // Acquire boot device.
-    if ( !(info->flags & MULTIBOOT_INFO_BOOTDEV) )
-    {
-        kprintf("Notice: No boot-device-info provided by bootloader.");
-    }
-
     // Initialze Interrupts & Co.
     system_init_idt();
     system_init_exceptions();
     system_init_irq();
+    sti();
+
+    // Initialize programmable interrupt timer.
     system_init_pit();
+
+    // Initialize the early threading system.
+    system_init_threading();
+    thread_create("test_thread", PRI_DEFAULT, kmain2, NULL);
+
+    for (volatile int i = 0; i < 20000000; ++i) { }
+    volatile int j = 0;
+    while(1)
+    {
+        for (j; j < 40000000; ++j) { }
+        kprintf("Call from: %s\n", thread_current()->name);
+        j = 0;
+    }
+
+    //
+    // SCIPTICISM FROM THIS POINT.
+    //
 
     // Initialize kernel dynamic allocation system. It should be initialzed to
     // start directly after the last module was loaded.

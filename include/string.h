@@ -1,22 +1,46 @@
 // 
 // Part of mOS (Minimalistic Operating System).
 // This software is distributed under the MIT License.
-// See the file LICENSE for details.
+// See the file LICENSE for detailes.
 //
 
-#ifndef _SYSTEM_STRING_H
-#define _SYSTEM_STRING_H
+// 
+// Stolen from Pintos, thank you all!
+//
+
+#ifndef __LIB_STRING_H
+#define __LIB_STRING_H
 
 #include <stddef.h>
 
-// Copying routines.
-void *memcpy(void *dst, const void *src, size_t n);
-void *memmove(void *dst, const void *src, size_t n);
-char *strcpy(char *dst, const char *src);
-char *strncpy(char *dst, const char *src);
+/* Standard. */
+void *memcpy (void *, const void *, size_t);
+void *memmove (void *, const void *, size_t);
+char *strncat (char *, const char *, size_t);
+int memcmp (const void *, const void *, size_t);
+int strcmp (const char *, const char *);
+void *memchr (const void *, int, size_t);
+char *strchr (const char *, int);
+size_t strcspn (const char *, const char *);
+char *strpbrk (const char *, const char *);
+char *strrchr (const char *, int);
+size_t strspn (const char *, const char *);
+char *strstr (const char *, const char *);
+void *memset (void *, int, size_t);
+size_t strlen (const char *);
 
-// Other routines:
-void *memset(void *ptr, int value, size_t n);
-size_t strlen(const char *str);
+/* Extensions. */
+size_t strlcpy (char *, const char *, size_t);
+size_t strlcpy_first_word (char *, const char *, size_t);
+size_t strlcat (char *, const char *, size_t);
+char *strtok_r (char *, const char *, char **);
+size_t strnlen (const char *, size_t);
+
+/* Try to be helpful. */
+#define strcpy dont_use_strcpy_use_strlcpy
+#define strncpy dont_use_strncpy_use_strlcpy
+#define strcat dont_use_strcat_use_strlcat
+#define strncat dont_use_strncat_use_strlcat
+#define strtok dont_use_strtok_use_strtok_r
 
 #endif

@@ -49,7 +49,7 @@ uint64_t idt_create_descriptor(void (*handler)(void), uint8_t dpl, uint8_t type,
     entry |= ((type == TASK_GATE) ? 1 << 12 : 0)    & 0x00001000;
     entry |= (((uint16_t) type) << 8)               & 0x00000F00;
     entry <<= 32;
-    entry |= (((uint32_t) code_selector) << 16)          & 0xFFFF0000;
+    entry |= (((uint32_t) code_selector) << 16)     & 0xFFFF0000;
     entry |= ((uintptr_t) handler)                  & 0x0000FFFF;
     return entry;
 }
@@ -57,4 +57,41 @@ uint64_t idt_create_descriptor(void (*handler)(void), uint8_t dpl, uint8_t type,
 void idt_add_isr(uint8_t vector, uint64_t descriptor)
 {
     system_idt_entries[vector] = descriptor;
+}
+
+enum intr_level intr_get_level()
+{
+    // Interrupt flag.
+    #define FLAG_IF     0x00000200
+
+    uint32_t flags;
+    asm volatile("pushfl; popl %0" : "=g"(flags));
+    return flags & FLAG_IF ? INTR_ON : INTR_OFF;
+}
+
+enum intr_level intr_disable()
+{
+    enum intr_level old_level = intr_get_level();
+    cli();
+    return old_level;
+}
+
+enum intr_level intr_enable()
+{
+    enum intr_level old_level = intr_get_level();
+    sti();
+    return old_level;
+}
+
+enum intr_level intr_set_level(enum intr_level level)
+{
+    return level == INTR_ON ? intr_enable() : intr_disable();
+}
+
+// Returns true if called from and IRQ of false if called from an interrupt
+// handler.
+int intr_context()
+{
+    // TODO: This function.
+    return 0;
 }

@@ -19,9 +19,12 @@ align 4
 
 
 section .bss
-align 4
+
+; The kernel stack must be page aligned in order to create a kernel thread
+; later on. The size of the kernel stack must also be one page.
+align 4096
 stack_bottom:
-resb 32768
+resb 4096
 stack_top:
 
 ; This section (USED TO) contain the page directory of the kernel. The table 

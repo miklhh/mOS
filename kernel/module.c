@@ -36,7 +36,7 @@ void system_init_modules(
 
         // Continue here...
         void (* func)() = (void (*)()) module_start_address;
-        //func();
+        func();
     }
     
     // REMOVE LATER!
