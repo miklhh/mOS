@@ -6,19 +6,23 @@
 #include <vaddr.h>
 #include <string.h>
 
-// "Magic" thread number.
+// "Magic" thread number for verifying the thread data type.
 #define THREAD_MAGIC 0xBEEFDEED
 
-// Stack offset in the struct thread aggregate.
+// Export the offset to the stack field in the thread aggregate. This is used
+// in the switch_thread assembly routine.
 uint32_t thread_struct_stack_offset = offsetof(struct thread, stack);
 
-// Is kernel threading initialized=
+// Threading initialzed flag.
 static int kernel_threading_initialized = 0;
+
+// Threading finalized flag.
+static int kernel_threading_finalized = 0;
 
 // List of ready threads.
 static struct list ready_list;
 
-// Idle thread.
+// Idle thread used to accomplish suspension and idle statistic ticking.
 static struct thread *idle_thread;
 
 // Initial thread, the thread running kmain.c:kmain(...)
@@ -27,33 +31,7 @@ static struct thread *initial_thread;
 // Lock used by allocate_tid().
 static struct lock tid_lock;
 
-// switch_threads stack frame.
-struct __attribute__((packed)) switch_threads_frame
-{
-    uint32_t edi;
-    uint32_t esi;
-    uint32_t ebp;
-    uint32_t ebx;
-    void (*eip)();
-    struct thread *cur;
-    struct thread *next;
-};
-
-// switch_entry stack frame:
-struct switch_entry_frame
-{
-    void (*eip)();
-};
-
-// Stack frame for kernel_thread().
-struct kernel_thread_frame
-{
-    void *eip;
-    void (* func)(void *aux);
-    void *aux;
-};
-
-// Scheduling.
+// Scheduling data.
 #define TIME_SLICE 4            // Thread time slice.
 static unsigned thread_ticks;   // Ticks since last yield.
 
@@ -64,6 +42,7 @@ static long long user_ticks;    // Ticks spent by user.
 
 // External assembly function for switching thread.
 extern struct thread *switch_threads(struct thread *cur, struct thread *next);
+
 
 
 // Returns zero if object pointed to by t is not considered a thread. Returns 

@@ -74,8 +74,8 @@ typedef int tid_t;
  * an assertion failure in thread_current(), which checks that
  * the `magic' member of the running thread's `struct thread' is
  * set to THREAD_MAGIC.  Stack overflow will normally change this
- * value, triggering the assertion. */
-
+ * value, triggering the assertion. 
+ */
 struct thread
 {
     tid_t tid;
@@ -90,9 +90,33 @@ struct thread
     struct list_elem elem;
 };
 
-// Initialze.
-//void thread_init();
-//void thread_start();
+// Switch_threads routine stack frame after register preservation.
+struct __attribute__((packed)) switch_threads_frame
+{
+    uint32_t edi;
+    uint32_t esi;
+    uint32_t ebp;
+    uint32_t ebx;
+    void (*eip)();
+    struct thread *cur;
+    struct thread *next;
+};
+
+// Switch_entry stack frame.
+struct switch_entry_frame
+{
+    void (*eip)();
+};
+
+// Stack frame for kernel_thread.
+struct kernel_thread_frame
+{
+    void *eip;
+    void (* func)(void *aux);
+    void *aux;
+};
+
+// Initialization routines.
 void system_init_threading();
 void system_init_threading_final();
 

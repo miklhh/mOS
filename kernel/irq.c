@@ -14,7 +14,7 @@
 #include <thread.h>
 
 #define IRQ_COUNT       16
-#define NULL            0
+//#define NULL            0
 
 // Flag for routine to ask for yield on return.
 static int yield_on_return;
@@ -54,7 +54,7 @@ void irq_handler(struct regs *r)
     // Make sure this handler was called correctly.
     if (r->int_no <= 0x4f && r->int_no >= 0x20)
     {
-        if ( (uintptr_t)irq_routine[r->int_no - 32] == NULL )
+        if ( (uintptr_t)irq_routine[r->int_no - 32] == (uintptr_t) NULL )
         {
             // No IRQ-routine exists for this
             kprintf("IRQ: 0x%x not handled.\n", r->int_no - 32);
@@ -125,6 +125,15 @@ void system_init_irq()
     // wrath and fear to be found. No one should have to witness this, ever.
     // The deadliest of sins 'code duplication' is unforgivable.
     // Forgive me father, for I have sinned...
+    
+    #define CREATE_DEFAULT_HANDLER(NR)                  \
+    { extern void irq_default_handler_ ## NR();         \
+        idt_add_isr(NR,  idt_create_descriptor(         \
+                    irq_default_handler_ ## NR,   \
+                    0, INTERRUPT_GATE, 0x08)); }
+    CREATE_DEFAULT_HANDLER(32);
+    CREATE_DEFAULT_HANDLER(33);
+
     extern void irq_default_handler_32();
     extern void irq_default_handler_33();
     extern void irq_default_handler_34();

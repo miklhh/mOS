@@ -55,25 +55,30 @@ void kmain(
     {
         // Multiboot failure.
         kprintf("Error: unsuccessful multiboot.\n");
-        kprintf("Expected boot magic: '0x%x' vs acctual: '0x%x'", MULTIBOOT_BOOTLOADER_MAGIC, magic);
+        kprintf("Expected boot magic: '0x%x' vs acctual: '0x%x'", 
+                MULTIBOOT_BOOTLOADER_MAGIC, magic);
         halt_and_shutdown();
     }
 
     // Print kernel size.
-    extern uintptr_t __kernel_start;
-    extern uintptr_t __kernel_end;
-    char kernel_size[10];
-    format_memory(kernel_size, (uintptr_t)&__kernel_end - (uintptr_t)&__kernel_start);
-    kprintf("Kernel position:      0x%08x -> 0x%08x [%s]\n", 
-            &__kernel_start, &__kernel_end, kernel_size);
+    extern uintptr_t __kernel_start, __kernel_end;
+    uintptr_t kernel_start = (uintptr_t)&__kernel_start;
+    uintptr_t kernel_end = (uintptr_t)&__kernel_end;
+    char kernel_size[FORMAT_MEMORY_STRING_LEN];
+    format_memory(kernel_size, kernel_end - kernel_start);
+    kprintf("Kernel position:   0x%08x -> 0x%08x [%s]\n",
+            kernel_start, kernel_end, kernel_size);
 
     // Print kernel stack information.
-    char stack_size[10];
+    char stack_size[FORMAT_MEMORY_STRING_LEN];
     format_memory(stack_size, stack_top - stack_bottom);
-    kprintf("Kernel stack:         0x%08x -> 0x%08x [%s]\n", 
+    kprintf("Kernel stack:      0x%08x -> 0x%08x [%s]\n", 
             stack_bottom, stack_top, stack_size);
 
     // Acquire memory information.
+    uintptr_t mem_start;            // Start of contigous memory.
+    uintptr_t mem_end;              // End of contigous memory.
+    uintptr_t available_ram_pages;  // RAM pages after kernel.
     if ( !(info->flags & MULTIBOOT_INFO_MEMORY) )
     {
         kprintf("Fatal: No memory-info provided by bootloader.\n");
@@ -82,15 +87,19 @@ void kmain(
     }
     else
     {
-        char available_memory[10];
-        format_memory(available_memory, info->mem_upper * 0x400);
-        kprintf("Available memory:     0x%08x -> 0x%08x [%s]\n", 
-                0x00100000, 
-                0x00100000 + info->mem_upper*0x400, 
-                available_memory);
+        // The mem_start and mem_end data is defined by the multiboot 
+        // specification.
+        char available_memory[FORMAT_MEMORY_STRING_LEN];
+        mem_start = 0x00100000;
+        mem_end = mem_start + info->mem_upper*0x400;
+        assert(mem_start < mem_end);
+        format_memory(available_memory, info->mem_upper * 0x400 - mem_start);
+        kprintf("Available memory:  0x%08x -> 0x%08x [%s]\n", 
+                mem_start, mem_end, available_memory);
     }
 
-    // Initialze Interrupts & Co.
+    // Initialze Interrupts & Co. After this we are ready for interrupts, set 
+    // the CPU interrupt flag.
     system_init_idt();
     system_init_exceptions();
     system_init_irq();

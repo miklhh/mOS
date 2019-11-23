@@ -82,11 +82,6 @@ void system_init_exceptions()
     extern void page_fault_handler(struct regs *r);
     exception_routine[14] = page_fault_handler;
 
-    // Forgive me father, for I have sinned. Beyond this point, there is only
-    // wrath and fear to be found. No one should have to witness this, ever.
-    // The deadliest of sins 'code duplication' is unforgivable.
-    // Forgive me father, for I have sinned...
-    
     #define CREATE_DEFAULT_HANDLER(NR)                     \
         { extern void exception_default_handler_ ## NR();  \
           idt_add_isr(NR,  idt_create_descriptor(          \
