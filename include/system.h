@@ -18,9 +18,12 @@ extern void system_init_idt();
 extern void system_init_exceptions();
 extern void system_init_irq();
 extern void system_init_pit();
-extern void system_init_kalloc();
-extern void system_init_paging(unsigned mem_size);
-extern void system_init_heap(uintptr_t mem_end);
+extern void system_init_page_frame_allocator(uintptr_t, uintptr_t);
+
+
+//extern void system_init_kalloc();
+//extern void system_init_paging(unsigned mem_size);
+//extern void system_init_heap(uintptr_t mem_end);
 
 // Halt and shutdown routine. Calling this routine will dissable intterupts and
 // halt the processor. There is no going back from this.

@@ -47,6 +47,8 @@ void system_init_pit()
 {
     pit_set_freq(PIT_FREQUENCY);
     irq_add(pit_isr, 0);
+    kprintf("[ PIT ] Programmable interval timer set for interrupt @ %d Hz\n", 
+            PIT_FREQUENCY);
 }
 
 // Rouine for setting the PIT frequency.

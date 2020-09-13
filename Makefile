@@ -1,5 +1,5 @@
 ARCH := i686
-CROSSDIR := ~/opt/cross/bin
+CROSSDIR := ~/opt/i686-elf/bin
 SYSROOT := sysroot
 
 # Compiler options.
